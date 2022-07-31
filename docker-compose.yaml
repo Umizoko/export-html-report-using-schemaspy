@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+
+  schemaspy:
+    image: schemaspy/schemaspy:6.1.0
+    volumes:
+      - ./output:/output
+      - ./schemaspy/schemaspy.properties:/schemaspy.properties
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:5.7
+    volumes:
+      - ./mysql/initdb.d:/docker-entrypoint-initdb.d
+      - ./mysql/custom:/etc/mysql/conf.d
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: onlinestore
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping"]
+      interval: 25s
+      timeout: 5s
+      retries: 5
